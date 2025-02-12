@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+export BIN=1
+
+curl -s https://yamlscript.org/install | bash

@@ -1,0 +1,48 @@
+!YS v0:
+
+site_name: Get YS!
+
+site_url: https://getys.org
+site_author: Ingy döt Net
+site_description: Get YS
+
+repo_name: GitHub
+repo_url: https://github.com/yaml/getys-org
+
+docs_dir: src
+
+theme:: load('config/theme.yaml')
+
+# For multi-version docs see:
+# https://squidfunk.github.io/mkdocs-material/setup/setting-up-versioning/
+extra_css:
+- css/theme.css
+
+strict: false
+
+validation:
+  omitted_files: ignore
+  absolute_links: ignore
+  unrecognized_links: ignore
+  anchors: ignore
+
+dev_addr: 0.0.0.0:8000
+
+plugins:
+- link-marker
+- search
+
+markdown_extensions:
+- admonition
+- attr_list
+- md_in_html
+- pymdownx.emoji:
+    emoji_index: +!!python/name:material.extensions.emoji.twemoji
+    emoji_generator: +!!python/name:material.extensions.emoji.to_svg
+- pymdownx.details
+- pymdownx.snippets
+- pymdownx.superfences
+- pymdownx.tabbed:
+    alternate_style: true
+
+copyright: YS / YAMLScript — Copyright 2022-2025
