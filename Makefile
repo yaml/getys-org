@@ -133,6 +133,7 @@ endif
 clean::
 	killall watchmedo || true
 	$(RM) $(CONFIG) sample $T
+	$(RM) -r site
 
 realclean:: clean
 	$(RM) -r $(PYTHON_VENV) material
