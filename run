@@ -2,4 +2,4 @@
 
 set -euo pipefail
 
-curl -s https://yamlscript.org/run-ys | bash
+curl -s https://yamlscript.org/run-ys
