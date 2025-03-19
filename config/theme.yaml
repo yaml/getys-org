@@ -1,14 +1,8 @@
 name: material
 
-# custom_dir: theme
-# logo: images/yamlscript-logo.svg
-# favicon: images/favicon.ico
-
 features:
 - header.autohide
 - navigation.footer
-# - navigation.indexes
-# - navigation.tabs
 
 palette:
 - scheme: default
@@ -20,18 +14,3 @@ palette:
   toggle:
     icon: material/weather-sunny
     name: Switch to light mode
-
-icon:
-  admonition:
-    abstract: fontawesome/solid/book
-    bug: fontawesome/solid/robot
-    danger: fontawesome/solid/skull
-    example: fontawesome/solid/flask
-    failure: fontawesome/solid/bomb
-    info: fontawesome/solid/circle-info
-    note: fontawesome/solid/note-sticky
-    question: fontawesome/solid/circle-question
-    quote: fontawesome/solid/quote-left
-    success: fontawesome/solid/check
-    tip: fontawesome/solid/bullhorn
-    warning: fontawesome/solid/triangle-exclamation

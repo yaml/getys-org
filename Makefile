@@ -18,7 +18,7 @@ VENV := source $(PYTHON_VENV)/bin/activate
 WATCHER := $(VENV) && watchmedo shell-command
 WATCH := \
   util/mdys \
-  config.ys \
+  mkdocs.ys \
   config/ \
   Makefile \
 
@@ -32,6 +32,7 @@ WATCH := $(subst $(space),;,$(WATCH))
 DEPS := \
   $(PYTHON_VENV) \
   $(CONFIG) \
+  src/run \
 
 
 default::
@@ -132,12 +133,15 @@ endif
 
 clean::
 	killall watchmedo || true
-	$(RM) $(CONFIG) sample $T
+	$(RM) $(CONFIG) sample $T src/run
 	$(RM) -r site
 
 realclean:: clean
 	$(RM) -r $(PYTHON_VENV) material
 	rm -f mt
+
+src/run:
+	curl -s https://yamlscript.org/run-ys > $@
 
 $(VENV_DIR): $(PYTHON_VENV)
 
@@ -149,7 +153,7 @@ $(PYTHON_VENV):
 # This hack is a workaround to preserve them.
 YS_YAML_TAG_HACK := perl -pe 's{: \+!}{: !}'
 
-$(CONFIG): config.ys config/*
+$(CONFIG): mkdocs.ys config/*
 	@( \
 	  set -euo pipefail; \
 	  echo "# DO NOT EDIT - GENERATED FROM '$<'"; \

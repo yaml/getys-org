@@ -1,4 +1,4 @@
-!YS v0:
+!YS-v0:
 
 site_name: Get YS!
 
@@ -11,7 +11,8 @@ repo_url: https://github.com/yaml/getys-org
 
 docs_dir: src
 
-theme:: load('config/theme.yaml')
+theme:
+  name: material
 
 # For multi-version docs see:
 # https://squidfunk.github.io/mkdocs-material/setup/setting-up-versioning/
