@@ -137,7 +137,7 @@ clean::
 	$(RM) -r site
 
 realclean:: clean
-	$(RM) -r $(PYTHON_VENV) material
+	$(RM) -r $(PYTHON_VENV) material gh-pages
 	rm -f mt
 
 src/run:
