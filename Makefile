@@ -1,21 +1,21 @@
-SHELL := bash
+M := .cache/makes
+$(shell [ -d $M ] || ( git clone -q https://github.com/makeplus/makes $M))
 
-ROOT := $(shell pwd)
+include $M/init.mk
+include $M/python.mk
+include $M/yamlscript.mk
+include $M/clean.mk
+include $M/shell.mk
 
-PYTHON := $(shell command -v python3)
-PYTHON ?= $(shell command -v python)
 
-export ROOT
+PYTHON-VENV-SETUP := pip install -r requirements.txt
 
 CONFIG := mkdocs.yml
 
-MKDOCS_MATERIAL_VERSION := 9.5.50
-MKDOCS_MATERIAL_REPO := https://github.com/squidfunk/mkdocs-material
+MKDOCS-MATERIAL-VERSION := 9.5.50
+MKDOCS-MATERIAL-REPO := https://github.com/squidfunk/mkdocs-material
 
-PYTHON_VENV := $(ROOT)/.venv
-VENV := source $(PYTHON_VENV)/bin/activate
-
-WATCHER := $(VENV) && watchmedo shell-command
+WATCHER := watchmedo shell-command
 WATCH := \
   util/mdys \
   mkdocs.ys \
@@ -30,7 +30,7 @@ T := /tmp/ys-website.tmp
 WATCH := $(subst $(space),;,$(WATCH))
 
 DEPS := \
-  $(PYTHON_VENV) \
+  $(PYTHON-VENV) \
   $(CONFIG) \
   src/run \
 
@@ -40,28 +40,28 @@ default::
 deps: line1 $(DEPS) line2
 
 ifeq (live,$(website))
-  YS_WWW_DOMAIN := getys.org
-  YS_WWW_REMOTE := git@github.com:yaml/getys-org
-  YS_WWW_BRANCH ?= gh-pages
+  YS-WWW-DOMAIN := getys.org
+  YS-WWW-REMOTE := git@github.com:yaml/getys-org
+  YS-WWW-BRANCH ?= gh-pages
 else ifeq (stage,$(website))
-  export YS_WWW_DEV := true
-  YS_WWW_DOMAIN := stage.getys.org
-  YS_WWW_REMOTE := git@github.com:yaml/stage-getys-org
-  YS_WWW_BRANCH := site
+  export YS-WWW-DEV := true
+  YS-WWW-DOMAIN := stage.getys.org
+  YS-WWW-REMOTE := git@github.com:yaml/stage-getys-org
+  YS-WWW-BRANCH := site
 endif
 
 build:: $(DEPS)
 	$(RM) -r site
 	git worktree add -f site
 	$(RM) -r site/*
-	$(VENV) && mkdocs build
-	echo $(YS_WWW_DOMAIN) > site/CNAME
+	mkdocs build
+	echo $(YS-WWW-DOMAIN) > site/CNAME
 	git -C site add -A
 
 # serve: $(DEPS) watch
 
 serve: $(DEPS)
-	$(VENV) && mkdocs serve
+	mkdocs serve
 
 deps-update: deps-update-notify deps
 
@@ -70,15 +70,15 @@ deps-update-notify:
 
 # XXX - See 'mkdocs gh-deploy' for a more standard way to do this
 # Options remote_branch and remote_name are used for gh-deploy
-ifeq (,$(YS_WWW_REMOTE))
+ifeq (,$(YS-WWW-REMOTE))
 publish:
 	$(error Use 'make publish website=<live|stage>' to publish)
 else
 publish: build
 	-git -C site commit -m "Publish $$(date)"
-	git -C site push $(YS_WWW_REMOTE) HEAD:$(YS_WWW_BRANCH) --force
+	git -C site push $(YS-WWW-REMOTE) HEAD:$(YS-WWW-BRANCH) --force
 	@echo
-	@echo "Published to https://$(YS_WWW_DOMAIN)"
+	@echo "Published to https://$(YS-WWW-DOMAIN)"
 	@echo
 endif
 
@@ -108,8 +108,8 @@ material:
 	  clone \
 	  --quiet \
 	  --depth 1 \
-	  --branch $(MKDOCS_MATERIAL_VERSION) \
-	  $(MKDOCS_MATERIAL_REPO) $@
+	  --branch $(MKDOCS-MATERIAL-VERSION) \
+	  $(MKDOCS-MATERIAL-REPO) $@
 	printf '%s\n' material/* | \
 	  grep -Ev '/(docs|material|mkdocs.yml)' | \
 	  xargs $(RM) -r
@@ -123,42 +123,32 @@ ifeq (,$(f))
 endif
 	cp $</$</templates/$f theme/$f
 
-pip-install: $(PYTHON_VENV)
+pip-install: $(PYTHON-VENV)
 ifeq (,$(m))
 	@echo 'm=<module> is not set'
 	@exit 1
 endif
-	$(VENV) && pip install $m
-	$(VENV) && pip freeze > requirements.txt
+	pip install $m
+	pip freeze > requirements.txt
 
 clean::
 	killall watchmedo || true
 	$(RM) $(CONFIG) sample $T src/run
 	$(RM) -r site
 
-realclean:: clean
-	$(RM) -r $(PYTHON_VENV) material gh-pages
-	rm -f mt
-
 src/run:
 	curl -s https://yamlscript.org/run-ys > $@
 
-$(VENV_DIR): $(PYTHON_VENV)
-
-$(PYTHON_VENV):
-	$(PYTHON) -m venv $@
-	$(VENV) && pip install -r requirements.txt
-
 # YS doesn't support !!python tags yet.
 # This hack is a workaround to preserve them.
-YS_YAML_TAG_HACK := perl -pe 's{: \+!}{: !}'
+YS-YAML-TAG-HACK := perl -pe 's{: \+!}{: !}'
 
-$(CONFIG): mkdocs.ys config/*
+$(CONFIG): mkdocs.ys config/* $(YS)
 	@( \
 	  set -euo pipefail; \
 	  echo "# DO NOT EDIT - GENERATED FROM '$<'"; \
 	  echo; \
-	  ys -Y $< | $(YS_YAML_TAG_HACK) \
+	  ys -Y $< | $(YS-YAML-TAG-HACK) \
 	) > $T
 	@if ! [[ -s $T ]]; then \
 	  echo "*** Error: failed to generate $@"; \
